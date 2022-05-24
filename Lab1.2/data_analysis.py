@@ -21,6 +21,8 @@ list_3 = list(map(getvalue, sheet['D'][1:]))
 pyplot.plot(list_1, list_2, label="temp")
 pyplot.plot(list_1, list_3, label="active")
 
+pyplot.legend(loc='upper left')
+
 #вывод графика
 pyplot.show()
 
