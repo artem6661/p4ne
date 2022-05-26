@@ -1,49 +1,17 @@
-# Подключаем часть библиотеки 'pysnmp'. 'hlapi' означает high-level API
 from pysnmp.hlapi import *
 
-# Обрабатывать ошибки будем с помощью исключений. Определяем одно простейшее исключение "ошибка SNMP"
-class Snmp_exception(Exception): pass
+snmp_engine = SnmpEngine()
+UsmUserData = UsmUserData(userName="monRO", authKey="ROmonVW!", authProtocol="md5", mpModel=3)
+transport = UdpTransportTarget(("10.26.44.95", 161))
+context_data = ContextData()
 
-# Функция опроса по SNMP - принимает на вход объект-генератор, предоставленный библиотекой,
-# проходит по нему, выводит результаты, при ошибках порождает исключения
-def print_snmp(g):
-    """Takes a generator object from pysnmp, prints snmp values"""
-    # Actual request performs here.
-    for snmp_result in g:
-        errorIndication, errorStatus, errorIndex, varBinds = snmp_result
-        if errorIndication:
-            print(errorIndication)
-            raise Snmp_exception
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-            raise Snmp_exception
-        else:
-            for varBind in varBinds:
-                print(varBind)
-                print(' = '.join([x.prettyPrint() for x in varBind]))
+snmp_system = ObjectIdentity("SNMPv2-MIB", "sysDescr", 0)
+snmp_interfaces = ObjectIdentity("1.3.6.1.2.1.2.2.1.2")
 
-try:
-    # Библиотечная функция getCmd реализует SNMP-метод getcmd, возвращает объект-генератор,
-    # при проходе по которому выполняются SNMP-запросы
-    g = getCmd(SnmpEngine(),
-               CommunityData('public', mpModel=0),
-               UdpTransportTarget(('10.31.70.107', 161)),
-               ContextData(),
-               ObjectType(ObjectIdentity('SNMPv2-MIB', 'sysDescr', 0)))
+result = getCmd(snmp_engine, UsmUserData, transport, context_data, ObjectType(snmp_system))
 
-    # Вывод результатов реализован как отдельная функция
-    print_snmp(g)
-
-    # Библиотечная функция nextCmd работает аналогично getCmd, но реализует SNMP-метод nextcmd
-    n = nextCmd(SnmpEngine(),
-               CommunityData('public', mpModel=0),
-               UdpTransportTarget(('10.31.70.107', 161)),
-               ContextData(),
-               ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.2')),
-               lexicographicMode=False)
-
-    print_snmp(n)
-except:
-    # Управление передаётся сюда из любых точек, где есть оператор raise
-    print('Error - exception')
+type(result)
+"class>" "generator"
+for i in result:
+    for j in i[3]:
+        print(j)
