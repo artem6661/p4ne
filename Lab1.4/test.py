@@ -1,5 +1,5 @@
 class Subnet:
-    def __init__(self, n='0.0.0.0',p='/0'):
+    def __init__(self, n,p):
         self.network=n
         self.prefix=p
     def __str__(self):
@@ -13,10 +13,16 @@ class Subnet:
 
 n1=Subnet('192.168.1.0','/24')
 n2=Subnet('172.16.0.0','/16')
-n3=Subnet()
 
 L = [n1,n2]
 
-print(L)
 
-print(n1)
+class A_P_E(Subnet):
+    def __init__(self, n, p, gw):
+        Subnet. __init__(self,n,p)
+        self.gateway=gw
+    def getgw(self):
+        return self.gateway
+
+ap = A_P_E('192.168.5.0', '/24', "192.168.1.1")
+print(ap)
